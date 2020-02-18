@@ -1,20 +1,18 @@
 #include <WiFi.h>
-#include <PubSubClient.h>
-const char* ssid = "inex-tplink";
-const char* password = "123456789-0";
+#include <PubSubClient.h>  // ผนวกไฟล์ไลบรารี MQTT
+const char* ssid = "--your ssid--"; // ชื่อตัวปล่อยสัญญาณ Wi-Fi
+const char* password = "--your password--"; //รหัสผ่านตัวปล่อยสัญญาณ Wi-Fi
 const char* mqtt_server = "broker.netpie.io";
 const int mqtt_port = 1883;
-const char* mqtt_Client = "93bafdfe-6b8e-457f-b4f8-58928f7d705f";
-const char* mqtt_username = "PMxSvRyoTK5Qi9BnrzMbSFGNTUY7v171";
-const char* mqtt_password = "rU6VjlSH6t.$FVUg@PRehvw)rZUwG8Ir";
-WiFiClient espClient;    
+const char* mqtt_Client = "--your Client ID--"; // Client ID ที่ได้จากการสร้าง Device
+const char* mqtt_username = "--your Token--"; // Token ที่ได้จากการสร้าง Device
+const char* mqtt_password = "--your Secret--"; // Secret ได้จากการสร้าง Device
+WiFiClient espClient;
 PubSubClient client(espClient);
 long lastMsg = 0;
 int value = 0;
 void reconnect() {
-  //WiFi.begin(ssid, password);
-  //delay(10);
-  while (!client.connected()) { // วนทำซ้ำจนกว่าจะเชื่อมต่อ Netpie ได้
+  while (!client.connected()) { // วนทำซ้ำจนกว่าจะเชื่อมต่อได้
     Serial.print("Attempting MQTT connection…");
     // ตรวจสอบการเชื่อมต่อไป broker Netpie
     if (client.connect(mqtt_Client, mqtt_username, mqtt_password)) {
@@ -48,13 +46,13 @@ void loop() {
   if (!client.connected()) { //ตรวจสอบการเชื่อมต่อ
     reconnect();  //เชื่อมต่อใหม่
   }
-  client.loop();  // ฟังก์ชั่นค่อยตรวจสอบการเชื่อมต่อและข้อมูลที่ส่งเข้ามา
+  client.loop();  //ฟังก์ชั่นค่อยตรวจสอบการเชื่อมต่อและข้อมูลที่ส่งเข้ามา
   long now = millis();
-  if (now - lastMsg > 5000) {  //ตรวจสอบเวลาทุก 5 วินาทีจะทำในเงื่อนไข 1 ครั้ง
+  if (now - lastMsg > 5000) { //ตรวจสอบเวลาทุก 5 วินาทีจะทำในเงื่อนไข 1 ครั้ง
     lastMsg = now;
-    ++value;  // เพิ่มค่าตัวแปร value ขึ้นที่ละ 1 ค่า
-    String strValue = String(value); // เปลี่ยนตัวแปร value ให้อยู่ในรูปแบบชนิดสตริง
-    // ส่งค่าจำนวนนับไปยัง broker Netpie 
+    ++value;  //เพิ่มค่าตัวแปร value ขึ้นที่ละ 1 ค่า
+    String strValue = String(value); //เปลี่ยนตัวแปร value ให้อยู่ในรูปแบบชนิดสตริง
+    // ส่งค่าจำนวนนับไปยัง broker Netpie
     client.publish("@msg/counter", (char*)strValue.c_str());
     Serial.println(value);
   }
